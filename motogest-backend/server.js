@@ -99,6 +99,11 @@ const start = async () => {
   try {
     await db.query('SELECT NOW()');
     console.log('✅ Banco de dados conectado.');
+const bcrypt = require('bcryptjs');
+bcrypt.hash('admin123', 10).then(h => {
+  db.query("UPDATE users SET password=$1 WHERE email='admin@motogest.com'", [h]);
+  console.log('✅ Senha admin sincronizada');
+});
 
     app.listen(PORT, () => {
       console.log(`🚀 MotoGest API rodando na porta ${PORT}`);
