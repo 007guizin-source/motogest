@@ -1,0 +1,35 @@
+{
+  "name": "MotoGest — Gestão de Moto Peças",
+  "short_name": "MotoGest",
+  "description": "Sistema completo de gestão para loja de moto peças",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090f",
+  "theme_color": "#f97316",
+  "orientation": "any",
+  "lang": "pt-BR",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "/icons/icon-72.png",  "sizes": "72x72",   "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-96.png",  "sizes": "96x96",   "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-128.png", "sizes": "128x128", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Abrir Caixa / PDV",
+      "url": "/pdv",
+      "icons": [{ "src": "/icons/pdv-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Ver Estoque",
+      "url": "/estoque",
+      "icons": [{ "src": "/icons/stock-96.png", "sizes": "96x96" }]
+    }
+  ],
+  "screenshots": [
+    { "src": "/screenshots/dashboard.png", "sizes": "1280x720", "type": "image/png", "label": "Dashboard" },
+    { "src": "/screenshots/pdv.png",       "sizes": "1280x720", "type": "image/png", "label": "Caixa / PDV" }
+  ]
+}
