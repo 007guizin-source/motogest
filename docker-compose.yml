@@ -34,7 +34,7 @@ services:
     environment:
       NODE_ENV:      production
       PORT:          3001
-      DATABASE_URL:  postgresql://motogest:motogest_senha@postgres:5432/motogest?sslmode=disable
+      DATABASE_URL:  postgresql://motogest:motogest_senha@postgres:5432/motogest
       JWT_SECRET:    troque_por_chave_aleatoria_muito_longa_aqui_64chars_min
       CORS_ORIGINS:  http://localhost:3000
     ports:

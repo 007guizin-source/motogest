@@ -19,6 +19,7 @@ const customerRoutes  = require('./routes/customers');
 const financialRoutes = require('./routes/financial');
 const reportRoutes    = require('./routes/reports');
 const userRoutes      = require('./routes/users');
+const categoryRoutes  = require('./routes/categories');
 
 // ── App ────────────────────────────────────────────────────────
 const app  = express();
@@ -89,6 +90,7 @@ app.use('/api/customers', customerRoutes);
 app.use('/api/financial', financialRoutes);
 app.use('/api/reports',   reportRoutes);
 app.use('/api/users',     userRoutes);
+app.use('/api/categories', categoryRoutes);
 
 // ── 404 e handler de erros ─────────────────────────────────────
 app.use(notFound);
@@ -99,11 +101,6 @@ const start = async () => {
   try {
     await db.query('SELECT NOW()');
     console.log('✅ Banco de dados conectado.');
-const bcrypt = require('bcryptjs');
-bcrypt.hash('admin123', 10).then(h => {
-  db.query("UPDATE users SET password=$1 WHERE email='admin@motogest.com'", [h]);
-  console.log('✅ Senha admin sincronizada');
-});
 
     app.listen(PORT, () => {
       console.log(`🚀 MotoGest API rodando na porta ${PORT}`);
