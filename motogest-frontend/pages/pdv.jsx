@@ -29,6 +29,8 @@ export default function PDVPage() {
   // Auto-foco no input
   useEffect(() => { inputRef.current?.focus(); }, []);
 
+  const scanTimer = useRef(null);
+
   // Busca de produtos
   useEffect(() => {
     if (!search || search.length < 2) { setResults([]); return; }
@@ -39,12 +41,32 @@ export default function PDVPage() {
       (p.barcode && p.barcode.includes(search))
     ).slice(0, 6);
     setResults(r);
-    // Leitura de código de barras (≥8 chars = scan automático)
-    if (r.length === 1 && search.length >= 8) {
-      addItem(r[0]);
-      setSearch(''); setResults([]);
+
+    // Timer: leitora digita tudo em <50ms, aguarda 80ms de silêncio e adiciona
+    if (scanTimer.current) clearTimeout(scanTimer.current);
+    if (search.length >= 4) {
+      scanTimer.current = setTimeout(() => {
+        const val = search.trim();
+        const byBarcode = products.find(p => p.barcode === val);
+        if (byBarcode) { addItem(byBarcode); return; }
+        const bySku = products.find(p => p.sku.toLowerCase() === val.toLowerCase());
+        if (bySku) { addItem(bySku); return; }
+        if (r.length === 1) { addItem(r[0]); }
+      }, 80);
     }
   }, [search, products]);
+
+  // Enter manual também funciona
+  const handleSearchKey = (e) => {
+    if (e.key !== 'Enter') return;
+    if (scanTimer.current) clearTimeout(scanTimer.current);
+    const val = search.trim();
+    const byBarcode = products.find(p => p.barcode === val);
+    if (byBarcode) { addItem(byBarcode); return; }
+    const bySku = products.find(p => p.sku.toLowerCase() === val.toLowerCase());
+    if (bySku) { addItem(bySku); return; }
+    if (results.length === 1) { addItem(results[0]); }
+  };
 
   const addItem = (p) => {
     if (p.stock <= 0) { toast.error(`Sem estoque: ${p.name}`); return; }
@@ -132,7 +154,7 @@ export default function PDVPage() {
               ref={inputRef}
               className="input pr-8"
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={handleSearchChange} onKeyDown={handleSearchKey}
               placeholder="Nome, SKU ou código de barras..."
             />
             {search && (

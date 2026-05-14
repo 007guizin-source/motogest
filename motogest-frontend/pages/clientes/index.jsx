@@ -4,7 +4,7 @@ import { PageHeader, SearchInput, Badge, Table, Modal, Field, StatCard, fmt, Spi
 import { useCustomers } from '../../hooks/useData';
 import { Plus, Pencil, CreditCard } from 'lucide-react';
 
-const EMPTY = { name: '', phone: '', document: '', city: '', credit_limit: 300 };
+const EMPTY = { name: '', phone: '', document: '', city: '', credit_limit: '' };
 
 export default function ClientesPage() {
   const [search, setSearch]     = useState('');
@@ -137,7 +137,7 @@ export default function ClientesPage() {
               <input className="input" value={form.city || ''} onChange={set('city')} />
             </Field>
             <Field label="Limite de Crédito (R$)">
-              <input className="input" type="number" value={form.credit_limit || 0}
+              <input className="input" type="number" value={form.credit_limit ?? ""} placeholder="0,00"
                 onChange={e => setForm(f => ({ ...f, credit_limit: parseFloat(e.target.value) || 0 }))} />
             </Field>
             <div className="col-span-2">

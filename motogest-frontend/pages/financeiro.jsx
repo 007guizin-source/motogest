@@ -11,7 +11,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recha
 export function FinanceiroPage() {
   const [period, setPeriod]   = useState('month');
   const [modal, setModal]     = useState(false);
-  const [form, setForm]       = useState({ type: 'entrada', category: 'Despesas' });
+  const [form, setForm]       = useState({ type: 'entrada', category: 'Despesas', value: '' });
   const [saving, setSaving]   = useState(false);
 
   const { data: summary }     = useFinancialSummary(period);
