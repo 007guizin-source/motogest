@@ -154,7 +154,7 @@ export default function PDVPage() {
               ref={inputRef}
               className="input pr-8"
               value={search}
-              onChange={handleSearchChange} onKeyDown={handleSearchKey}
+              onChange={e => setSearch(e.target.value)} onKeyDown={handleSearchKey}
               placeholder="Nome, SKU ou código de barras..."
             />
             {search && (
