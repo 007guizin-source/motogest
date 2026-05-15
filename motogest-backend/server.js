@@ -20,6 +20,7 @@ const financialRoutes = require('./routes/financial');
 const reportRoutes    = require('./routes/reports');
 const userRoutes      = require('./routes/users');
 const categoryRoutes  = require('./routes/categories');
+const supplierRoutes  = require('./routes/suppliers');
 
 // ── App ────────────────────────────────────────────────────────
 const app  = express();
@@ -91,6 +92,7 @@ app.use('/api/financial', financialRoutes);
 app.use('/api/reports',   reportRoutes);
 app.use('/api/users',     userRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/suppliers',  supplierRoutes);
 
 // ── 404 e handler de erros ─────────────────────────────────────
 app.use(notFound);
