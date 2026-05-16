@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
-import { LayoutDashboard, ShoppingCart, Package, Users, DollarSign, BarChart2, Shield, LogOut, Menu, X, Bell, Tag, Truck } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, Package, Users, DollarSign, BarChart2, Shield, LogOut, Menu, X, Bell, Tag, Truck, PackagePlus } from 'lucide-react';
 import clsx from 'clsx';
 
 const NAV = [
@@ -14,6 +14,7 @@ const NAV = [
   { href: '/relatorios', icon: BarChart2,       label: 'Relatórios',  roles: ['admin','gerente'] },
   { href: '/categorias',   icon: Tag,             label: 'Categorias',   roles: ['admin','gerente'] },
   { href: '/fornecedores', icon: Truck,           label: 'Fornecedores', roles: ['admin','gerente'] },
+  { href: '/entradas',    icon: PackagePlus,     label: 'Entradas',     roles: ['admin','gerente'] },
   { href: '/usuarios',   icon: Shield,          label: 'Usuários',    roles: ['admin'] },
 ];
 

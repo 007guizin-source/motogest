@@ -21,6 +21,7 @@ const reportRoutes    = require('./routes/reports');
 const userRoutes      = require('./routes/users');
 const categoryRoutes  = require('./routes/categories');
 const supplierRoutes  = require('./routes/suppliers');
+const entryRoutes     = require('./routes/entries');
 
 // ── App ────────────────────────────────────────────────────────
 const app  = express();
@@ -93,6 +94,7 @@ app.use('/api/reports',   reportRoutes);
 app.use('/api/users',     userRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/suppliers',  supplierRoutes);
+app.use('/api/entries',    entryRoutes);
 
 // ── 404 e handler de erros ─────────────────────────────────────
 app.use(notFound);
