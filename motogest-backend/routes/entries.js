@@ -148,3 +148,96 @@ router.delete('/:id', authorize('admin'), asyncHandler(async (req, res) => {
 }));
 
 module.exports = router;
+
+// GET /api/entries/:id/pdf — relatório PDF da entrada
+router.get('/:id/pdf', asyncHandler(async (req, res) => {
+  const PDFDocument = require('pdfkit');
+
+  const { rows: [entry] } = await db.query(`
+    SELECT e.*, s.name as supplier_name, u.name as user_name
+    FROM stock_entries e
+    LEFT JOIN suppliers s ON s.id = e.supplier_id
+    LEFT JOIN users u ON u.id = e.user_id
+    WHERE e.id = $1
+  `, [req.params.id]);
+
+  if (!entry) return res.status(404).json({ error: 'Entrada não encontrada.' });
+
+  const { rows: items } = await db.query(`
+    SELECT ei.qty, p.name as product_name, p.sku, p.location
+    FROM stock_entry_items ei
+    JOIN products p ON p.id = ei.product_id
+    WHERE ei.entry_id = $1
+    ORDER BY p.name ASC
+  `, [req.params.id]);
+
+  const totalQty = items.reduce((s, i) => s + i.qty, 0);
+  const date = new Date(entry.created_at).toLocaleDateString('pt-BR', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+
+  const doc = new PDFDocument({ margin: 50, size: 'A4' });
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `attachment; filename="entrada-${req.params.id.slice(0,8)}.pdf"`);
+  doc.pipe(res);
+
+  // Cabeçalho
+  doc.fontSize(22).fillColor('#f97316').text('MotoGest', 50, 45);
+  doc.fontSize(11).fillColor('#666').text('Sistema de Gestão — Loja de Moto Peças', 50, 72);
+  doc.moveTo(50, 90).lineTo(545, 90).strokeColor('#f97316').lineWidth(2).stroke();
+
+  doc.fontSize(16).fillColor('#111').text('Relatório de Entrada de Mercadoria', 50, 105);
+  doc.fontSize(11).fillColor('#444').text(`Data: ${date}`, 50, 128);
+  doc.text(`Registrado por: ${entry.user_name || '-'}`, 50, 144);
+  if (entry.supplier_name) doc.text(`Fornecedor: ${entry.supplier_name}`, 50, 160);
+  if (entry.notes) doc.text(`Obs: ${entry.notes}`, 50, entry.supplier_name ? 176 : 160);
+
+  // Tabela
+  const startY = 210;
+  const rowH = 24;
+  const cols = [50, 80, 340, 430, 545];
+
+  // Header
+  doc.rect(50, startY, 495, rowH).fill('#f97316');
+  doc.fontSize(10).fillColor('#fff');
+  doc.text('#',       cols[0]+4, startY+7, { width: cols[1]-cols[0]-8 });
+  doc.text('SKU',     cols[1]+4, startY+7, { width: cols[2]-cols[1]-8 });
+  doc.text('Produto', cols[2]+4, startY+7, { width: cols[3]-cols[2]-8 });
+  doc.text('Local',   cols[3]+4, startY+7, { width: cols[4]-cols[3]-8, align: 'center' });
+
+  // Adicionar coluna QTD
+  const cols2 = [50, 80, 310, 410, 470, 545];
+  doc.rect(50, startY, 495, rowH).fill('#f97316');
+  doc.fontSize(9).fillColor('#fff');
+  doc.text('#',        cols2[0]+4, startY+7, { width: 26 });
+  doc.text('SKU',      cols2[1]+4, startY+7, { width: cols2[2]-cols2[1]-8 });
+  doc.text('Produto',  cols2[2]+4, startY+7, { width: cols2[3]-cols2[2]-8 });
+  doc.text('Local',    cols2[3]+4, startY+7, { width: cols2[4]-cols2[3]-8, align: 'center' });
+  doc.text('Qtd',      cols2[4]+4, startY+7, { width: cols2[5]-cols2[4]-8, align: 'right' });
+
+  let y = startY + rowH;
+  items.forEach((item, idx) => {
+    if (y > 720) { doc.addPage(); y = 50; }
+    doc.rect(50, y, 495, rowH).fill(idx % 2 === 0 ? '#f9f9f9' : '#fff');
+    doc.fontSize(9).fillColor('#222');
+    doc.text(String(idx + 1),          cols2[0]+4, y+7, { width: 26 });
+    doc.text(item.sku || '-',          cols2[1]+4, y+7, { width: cols2[2]-cols2[1]-8 });
+    doc.text(item.product_name,        cols2[2]+4, y+7, { width: cols2[3]-cols2[2]-8 });
+    doc.text(item.location || '-',     cols2[3]+4, y+7, { width: cols2[4]-cols2[3]-8, align: 'center' });
+    doc.text(String(item.qty),         cols2[4]+4, y+7, { width: cols2[5]-cols2[4]-8, align: 'right' });
+    y += rowH;
+  });
+
+  // Total
+  y += 10;
+  doc.rect(50, y, 495, 30).fill('#f0f0f0');
+  doc.fontSize(11).fillColor('#111').text(`Total de produtos: ${items.length}`, 60, y+9);
+  doc.text(`Total de unidades: ${totalQty}`, 350, y+9, { width: 180, align: 'right' });
+
+  // Rodapé
+  doc.fontSize(9).fillColor('#aaa')
+    .text(`Gerado em ${new Date().toLocaleDateString('pt-BR')} pelo MotoGest`, 50, 790, { align: 'center', width: 495 });
+
+  doc.end();
+}));
