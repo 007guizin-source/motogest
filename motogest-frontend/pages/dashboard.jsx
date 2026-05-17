@@ -1,4 +1,6 @@
 import Layout from '../components/Layout';
+import useSWR from 'swr';
+import api from '../lib/api';
 import { StatCard, Badge, fmt, fmtDate } from '../components/UI';
 import { useSalesSummary, useSalesDaily, useLowStock, useCustomers } from '../hooks/useData';
 import { Spinner } from '../components/UI';
@@ -25,6 +27,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 export default function DashboardPage() {
   const { data: summary, isLoading: ls } = useSalesSummary();
+  const { data: totalStock } = useSWR('/api/products/total-stock', url => api.get(url).then(r => r.data), { refreshInterval: 60000 });
   const { data: daily,   isLoading: ld } = useSalesDaily(14);
   const { data: lowStock }               = useLowStock();
   const { customers }                    = useCustomers({ withDebt: true });
@@ -40,7 +43,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-5">
       {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
         {ls ? Array(5).fill(0).map((_, i) => (
           <div key={i} className="card flex items-center justify-center h-28">
             <Spinner className="text-dark-400" />
@@ -50,6 +53,7 @@ export default function DashboardPage() {
           <StatCard icon="📅" label="Vendas no Mês"     value={fmt(summary?.this_month)} trend={12} color="#60a5fa" />
           <StatCard icon="🏆" label="Vendas no Ano"     value={fmt(summary?.this_year)}  trend={5}  color="#10d9a0" />
           <StatCard icon="🛒" label="Vendas Hoje (qtd)" value={summary?.today_count ?? 0}           color="#f59e0b" />
+          <StatCard icon="📦" label="Total em Estoque" value={`${(totalStock?.total || 0).toLocaleString('pt-BR')} un.`} sub="unidades em todos os produtos" color="#a78bfa" />
           <StatCard icon="💳" label="Fiado Pendente"    value={fmt(debtTotal)} sub={`${customers.length} clientes`} color="#fb7185" />
         </>}
       </div>
